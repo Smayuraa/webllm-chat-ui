@@ -4,7 +4,10 @@ import "./App.css";
 
 function App() {
   const [messages, setMessages] = useState([
-    { role: "system", content: "Hey! How can I assist you today?" }
+    { role: "system", content: "hey, how I can assist you today?" },
+    { role: "user", content: "hey" },
+    { role: "tool", content: "bye" },
+    { role: "user", content: "by" },
   ]);
 
   const [input, setInput] = useState("");
@@ -12,7 +15,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const selectedModel = "Llama-3-8B-Instruct-q4f16_1-MLC"; 
+    const selectedModel = "Llama-3.1-8B-Instruct-q4f32_1-MLC";
     webllm
       .CreateMLCEngine(selectedModel, {
         initProgressCallback: (initProgress) => {
@@ -21,9 +24,6 @@ function App() {
       })
       .then((engine) => {
         setEngine(engine);
-      })
-      .catch((err) => {
-        console.error("Model initialization failed:", err);
       });
   }, []);
 
@@ -40,11 +40,18 @@ function App() {
         messages: updatedMessages,
       });
 
+      const text=reply.choices[0].message.content
+
+      tempMessages.push({
+        role:"assistant",
+        content:text
+      })
+      setMessages(tempMessages)
+
       console.log("reply", reply);
       setMessages([...updatedMessages, { role: "system", content: reply.message.content }]);
     } catch (error) {
       console.error("Error in getting reply:", error);
-      setMessages([...updatedMessages, { role: "system", content: "Oops! Something went wrong." }]);
     }
 
     setIsLoading(false);
@@ -56,30 +63,32 @@ function App() {
   }, [messages]);
 
   return (
-    <section>
-      <div className="conversation-area">
-        {!engine && <p className="loading-msg">Loading model...</p>}
-        <div className="messages">
-          {messages.map((msg, index) => (
-            <div className={`message ${msg.role}`} key={index}>
-              {msg.content}
-            </div>
-          ))}
+    <>
+      <section>
+        <div className="conversation-area">
+          {!engine && <p className="loading-msg">Loading model...</p>}
+          <div className="messages">
+            {messages.filter(message=>message.role!=='system').map((msg, index) => (
+              <div className={`message ${msg.role}`} key={index}>
+                {msg.content}
+              </div>
+            ))}
+          </div>
+          <div className="input-area">
+            <input
+              type="text"
+              placeholder="message"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && sendMessageToLlm()}
+            />
+            <button onClick={sendMessageToLlm}>
+              {isLoading ? "Sending..." : "Send"}
+            </button>
+          </div>
         </div>
-        <div className="input-area">
-          <input
-            type="text"
-            placeholder="Type your message..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessageToLlm()}
-          />
-          <button onClick={sendMessageToLlm} disabled={isLoading || !engine}>
-            {isLoading ? "Sending..." : "Send"}
-          </button>
-        </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 
