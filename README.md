@@ -15,4 +15,6 @@ A simple chatbot built using WEBLLM that runs large language models directly in 
 - Runs on WebGPU for fast in-browser inference.
 - Fully private, no backend server required.
 
-- `![App Screenshot](./src/assets/img.png)`
+## Screenshot
+
+![App Screenshot](./src/assets/img.png)
