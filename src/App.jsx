@@ -4,11 +4,13 @@ import "./App.css";
 
 function App() {
   const [messages, setMessages] = useState([
-    { role: "system", content: "hey, how I can assist you today?" },
-    { role: "user", content: "hey" },
-    { role: "tool", content: "bye" },
-    { role: "user", content: "by" },
+    { role: "system", content: "Hi! 👋 I'm your AI Assistant. How can I help you today?" },
+    { role: "user", content: "Tell me about WEBLLM." },
+    { role: "assistant", content: "WEBLLM allows large language models to run directly in your browser without needing a server. 🚀" },
+    { role: "user", content: "That's amazing!" },
   ]);
+  
+  
 
   const [input, setInput] = useState("");
   const [engine, setEngine] = useState(null);
